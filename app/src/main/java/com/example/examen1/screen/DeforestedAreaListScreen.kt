@@ -60,8 +60,9 @@ fun DeforestedAreaListScreen(navController: NavController, user_id: Int?){
     )
 
     val deforestedAreaList = remember {
-        mutableListOf(
-            DeforestedArea(
+        mutableStateOf(
+            listOf(
+                DeforestedArea(
                 nombre = "Zona 01",
                 fechaDeteccion = "01/05/23",
                 latitud = "82128772",
@@ -70,6 +71,7 @@ fun DeforestedAreaListScreen(navController: NavController, user_id: Int?){
                 CausaZD = "Agregar texto",
                 consecuenciaZD = "Otro texto",
                 img = R.drawable.ic_launcher_foreground.toString()
+                )
             )
         )
     }
@@ -102,15 +104,7 @@ fun DeforestedAreaListScreen(navController: NavController, user_id: Int?){
         DeforestedAreaCreate(
             isVisible = dialogStates.showAddDialog,
             onCreated = {
-                println("CREATE---notify" + deforestedAreaList.size)
-                deforestedAreaList.add(
-                    DeforestedArea(
-                        "Zona 04", "01/05/23",
-                        "82128772", "29292928", 20000.0,
-                        "Agregar texto", "Otro texto", R.drawable.ic_launcher_foreground.toString(),
-                    )
-                )
-                println("CREATE---notify" + deforestedAreaList.size)
+                println("CREATE---notify")
             }
         )
         DeforestedAreaDelete(
@@ -118,6 +112,7 @@ fun DeforestedAreaListScreen(navController: NavController, user_id: Int?){
             deforestedArea = dialogStates.deforestedArea,
             onDeleted = {
                 println("DELETE---notify")
+                deforestedAreaList.value = listOf()
             }
         )
         DeforestedAreaEdit(
@@ -135,7 +130,7 @@ fun DeforestedAreaListScreen(navController: NavController, user_id: Int?){
 fun DeforestedAreaListContent(
     navController: NavController,
     dialogStates: DialogStates,
-    deforestedAreaList: MutableList<DeforestedArea>,
+    deforestedAreaList: MutableState<List<DeforestedArea>>,
     user_id: Int?
 ){
     Column(
@@ -149,20 +144,20 @@ fun DeforestedAreaListContent(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(deforestedAreaList.size){ index ->
+                items(deforestedAreaList.value.size){ index ->
                     DeforestAreaCard(
-                        deforestedArea = deforestedAreaList.get(index),
+                        deforestedArea = deforestedAreaList.value.get(index),
                         detail = {
                             val id = 1 //deforestedAreaData.get(index).id
                             navController.navigate(route = AppScreen.DeforestedAreaDetailScreen.route + "/$user_id/$id")
                         },
                         edit = {
                             dialogStates.showEditDialog.value = true
-                            dialogStates.deforestedArea.value = deforestedAreaList.get(index).copy()
+                            dialogStates.deforestedArea.value = deforestedAreaList.value.get(index).copy()
                         },
                         delete = {
                             dialogStates.showDeleteDialog.value = true
-                            dialogStates.deforestedArea.value = deforestedAreaList.get(index).copy()
+                            dialogStates.deforestedArea.value = deforestedAreaList.value.get(index).copy()
                         }
                     )
                 }
